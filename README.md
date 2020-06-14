@@ -1,1 +1,3 @@
-# SwiftFarkle
+# farkle
+
+A description of this package.

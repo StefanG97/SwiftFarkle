@@ -1,4 +1,13 @@
 import Foundation
+import Rainbow
+
+extension String {
+    var isNumeric: Bool {
+        guard self.count > 0 else { return false }
+        let nums: Set<Character> = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        return Set(self).isSubset(of: nums)
+    }
+}
 
 struct Player{
 	var name: String
@@ -22,130 +31,164 @@ struct Player{
 	}
 }
 
+func systemPause(){
+	print("    Press any key to continue...".white.bold, terminator: "")
+	let _ = readLine(strippingNewline: true)!
+}
+
 func getInput() -> Int{
-	let sel = Int(readLine(strippingNewline: true)!)!
-	return sel
+	let input: String = readLine(strippingNewline: true)!
+	if input.isNumeric{
+		return Int(input)!
+	}
+	else{
+		return 7
+	}
 }
 
 func showRules(){
-	let path="/home/mastery0da/Swift/farkle/Rules.txt"
+	let path = FileManager.default.currentDirectoryPath + "/Rules.txt"
 	do{
 	    let contents = try String(contentsOfFile: path, encoding: .utf8)
-	    print(contents)
+	    print(contents.bold)
 	}
 	catch let error as NSError {
-	    print("Ooops! Something went wrong: \(error)")
+	    print("    Ooops! Something went wrong: \(error)")
 	}
-	system( " read -p'Press Enter to continue...' var " )
+	systemPause()
 }
+
 
 func showMenu(){
 	system("clear")
-	print("=================");
-	print("Welcome to Farkle");
-	print("=================");
-	print("Maximize the console window for best results. \n");
-	print("1) New Game");
-	print("2) Show Rules");
-	print("3) Quit \n");
-	print("Please enter a selection: ");
+	print("\u{001B}[?25h", terminator: "") 
+	print("    =======================".white.bold)
+	print("       Welcome to Farkle   ".green.bold)
+	print("    =======================\n".red.bold)
+	print("    Maximize the console window for best results. \n".bold.blink)
+	print("    1) New Game".green.bold)
+	print("    2) Show Rules".yellow.bold)
+	print("    3) Quit\n".red.bold)
+	print("    Please enter a selection: ".bold, terminator: "")
 }
 
 func congratulate(player: Player){
 	system("clear")
-	print("=================");
-	print(" CONGRATULATIONS ");
-	print("=================");
-	print(player.name, "is the winner with a score of", player.score, "points!");
-	system( " read -p'Press Enter to continue...' var " )
+	print("\u{001B}[?25h", terminator: "") 
+	print("    =======================".white.bold)
+	print("        CONGRATULATIONS    ".green.bold.blink)
+	print("    =======================\n".red.bold)
+	print("    \(player.name) is the winner with a score of \(player.score) points!\n".lightMagenta.bold)
+	systemPause()
 }
 
-func finalRound(player: Player){
+func finalRound(player: Player, players: [Player]){
 	system("clear")
-	print("=================");
-	print("   FINAL ROUND   ");
-	print("=================");
-	print(player.name, "has a score of", player.score, "!");
-	print("The final round of play has begun! Good luck! \n");
-	system( " read -p'Press Enter to continue...' var " )
+	print("\u{001B}[?25l", terminator: "")  
+	print("    =======================".white.bold)
+	print("          FINAL ROUND      ".green.bold.blink)
+	print("    =======================\n".red.bold)
+	print("    \(player.name) has a score of \(player.score)!\n".lightMagenta.bold.blink)
+	sleep(5)
+	system("clear")
+	print("    =======================".white)
+	showScoreboard(players: players)
+	print("\n    The final round of play has begun! Good luck! \n".lightGreen.bold)
+	systemPause()
+	print("\u{001B}[?25h", terminator: "")
+}
+
+func showScoreboard(players: [Player]){
+	print("          LEADERBOARD       ".green.bold)
+	print("    ========================".red.bold)
+	var tempPlayers: [Player] = players
+	tempPlayers.sort { (lhs: Player, rhs: Player) -> Bool in
+	    return lhs.score > rhs.score
+	}
+	for i in 0...players.count - 1{
+		print("    \(i+1). \(tempPlayers[i].name) : \(tempPlayers[i].score) points".bold)
+	}
 }
 
 func showKeptDice(keptDice: [Int]){
-	print("+------------+");
-	print("| Kept Dices |");
-	print("+------------+");
+	print("\u{001B}[?25h", terminator: "") 
+	print("    +----------------------+".lightGreen.bold)
+	print("    |      Kept Dices      |".lightGreen.bold)
+	print("    +----------------------+".lightGreen.bold)
 	for i in 0...keptDice.count - 1{
 		switch i {
-			case 0: print("|  ⚀   : ", keptDice[i], " |")
-			case 1: print("|  ⚁   : ", keptDice[i], " |")
-			case 2: print("|  ⚂   : ", keptDice[i], " |")
-			case 3: print("|  ⚃   : ", keptDice[i], " |")
-			case 4: print("|  ⚄   : ", keptDice[i], " |")
-			case 5: print("|  ⚅   : ", keptDice[i], " |")
-			default: print("Out of Bounds")
+			case 0: print("    |     ⚀     :    \(keptDice[i])     |".red.bold)
+			case 1: print("    |     ⚁     :    \(keptDice[i])     |".lightBlack.bold)
+			case 2: print("    |     ⚂     :    \(keptDice[i])     |".lightGreen.bold)
+			case 3: print("    |     ⚃     :    \(keptDice[i])     |".yellow.bold)
+			case 4: print("    |     ⚄     :    \(keptDice[i])     |".magenta.bold)
+			case 5: print("    |     ⚅     :    \(keptDice[i])     |".cyan.bold)
+			default: print("    Out of Bounds")
 		}
 	}
-	print("+------------+\n");
+	print("    +----------------------+\n".lightGreen.bold)
 }
 
 func showRolls(dicePool: [Int], selection: Int, count: inout Int){
-	print("+------------+");
-	print("| Dice Rolls |");
-	print("+------------+");
-
+	print("    +----------------------+".lightBlue.bold)
+	print("    |      Dice Rolls      |".lightBlue.bold)
+	print("    +----------------------+".lightBlue.bold)
+	print("\u{001B}[?25l", terminator: "") 
 	for i in 0...dicePool.count - 1{
 		if count == 0 || selection == 9{
 			for _ in 0...7500{
 				let temp: Int = Int.random(in: 1..<7)
 				switch temp {
 					case 1:
-						usleep(75)
-						print("|Die ", i + 1, " : ⚀ |", terminator: "")
+						usleep(50)
+						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚀".red.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					case 2:
-						usleep(75)
-						print("|Die ", i + 1, " : ⚁ |", terminator: "")
+						usleep(50)
+						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚁".lightBlack.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					case 3:
-						usleep(75)
-						print("|Die ", i + 1, " : ⚂ |", terminator: "")
+						usleep(50)
+						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚂".lightGreen.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					case 4:
-						usleep(75)
-						print("|Die ", i + 1, " : ⚃ |", terminator: "")
-						print("\r", terminator: "")
+						usleep(50)
+						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚃".yellow.bold,"    |".lightBlue.bold, terminator: "")
+						print("    \r", terminator: "")
 					case 5:
-						usleep(75)
-						print("|Die ", i + 1, " : ⚄ |", terminator: "")
+						usleep(50)
+						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚄".magenta.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					case 6:
-						usleep(75)
-						print("|Die ", i + 1, " : ⚅ |", terminator: "")
+						usleep(50)
+						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚅".cyan.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
-					default: print("error")	
+					default: print("    error")	
 				}
 			}
 		}
 		switch dicePool[i]{
-			case 1: print("|Die ", i + 1, " : ⚀ |")
-			case 2: print("|Die ", i + 1, " : ⚁ |")
-			case 3: print("|Die ", i + 1, " : ⚂ |")
-			case 4: print("|Die ", i + 1, " : ⚃ |")
-			case 5: print("|Die ", i + 1, " : ⚄ |")
-			case 6: print("|Die ", i + 1, " : ⚅ |")
-			default: print("error")
+			case 1: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚀".red.bold, "    |".lightBlue.bold)
+			case 2: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚁".lightBlack.bold, "    |".lightBlue.bold)
+			case 3: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚂".lightGreen.bold, "    |".lightBlue.bold)
+			case 4: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚃".yellow.bold, "    |".lightBlue.bold)
+			case 5: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚄".magenta.bold, "    |".lightBlue.bold)
+			case 6: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚅".cyan.bold, "    |".lightBlue.bold)
+			default: print("    error")
 		}
 	}
+	print("\u{001B}[?25h", terminator: "") 
 	count += 1
-	print("+------------+\n");	
+	print("    +----------------------+\n".lightBlue.bold)	
 }
 
 func welcomePlayers(players: [Player]){
 	var playerNames: String = ""
 	system("clear")
-	print("==================");
-	print("     WELCOME!     ");
-	print("==================");
+	print("\u{001B}[?25h", terminator: "") 
+	print("    ========================".white.bold)
+	print("             WELCOME        ".green.bold.blink)
+	print("    ========================\n".red.bold)
 	for i in 0...players.count - 1{
 		if i < (players.count - 2) && players.count > 2{
 			playerNames.append(players[i].name)
@@ -159,30 +202,31 @@ func welcomePlayers(players: [Player]){
 			playerNames.append(players[i].name)
 		}
 	}
-	print("Welcome", playerNames, "!\n")
-	system( " read -p'Press Enter to continue...' var " )
+	print("    Welcome \(playerNames)!\n".magenta.bold)
+	systemPause()
 }
 
 func promptNumPlayers(){
 	system("clear")
-	print("==================");
-	print("     NEW GAME     ");
-	print("==================");
-	print("How many players are there? ");
+	print("\u{001B}[?25h", terminator: "") 
+	print("    =======================".white.bold)
+	print("           NEW GAME        ".green.bold.blink)
+	print("    =======================\n".red.bold)
+	print("    How many players are there? ", terminator: "".lightYellow.bold)
 }
 
 func setupPlayerNames(players: inout [Player], numOfPlayers: Int){
 	system("clear")
-	print("==================");
-	print("   PLAYER NAMES   ");
-	print("==================");
+	print("\u{001B}[?25h", terminator: "") 
+	print("    ========================".white.bold)
+	print("          PLAYER NAMES      ".green.bold.blink)
+	print("    ========================\n".red.bold)
 	for i in 1...numOfPlayers{
-		print("Enter name for Player", i, "(no spaces):")
+		print("    Enter name for Player \(i) (no spaces): ".lightGreen.bold, terminator: "")
 		let name: String = readLine()!
 		var player: Player = Player()
 		player.name = name
 		players.append(player)
-		print("")
 	}
 }
 
@@ -195,7 +239,7 @@ func countDice(dicePool: [Int]) -> [Int]{
 }
 
 func checkFor10K(score: Int) -> Bool{
-	if score >= 1000{
+	if score >= 10000{
 		return true
 	}
 	return false
@@ -271,7 +315,7 @@ func scoreDice(dicePool: inout [Int], die: Int, dieCount: [Int], keptDice: inout
 				else{
 					score = dieValue * 800
 				}
-			default: print("err")
+			default: print("    err")
 		}
 	}
 	else if dieValue == 1 || dieValue == 5{
@@ -313,8 +357,9 @@ func play() -> Player{
 	while !(numOfPlayers > 1){
 		numOfPlayers = getInput()
 		if numOfPlayers < 2{
-			print("Invalid number of players. Must be more than 1.")
-			print("Try again: ")
+			print("\u{001B}[?25h", terminator: "") 
+			print("    Invalid number of players. Must be more than 1.".lightRed.bold)
+			print("    Try again: ".lightRed.bold)
 		}
 	}
 	var players: [Player] = []
@@ -328,7 +373,7 @@ func play() -> Player{
 			winner = getWinner(players: players)
 			continue
 		}
-		turnScore = turn(player: players[playerTurn])
+		turnScore = turn(player: players[playerTurn], players: players)
 		if !players[playerTurn].inGame && turnScore >= 0{
 			players[playerTurn].setInGame()
 		}
@@ -336,7 +381,7 @@ func play() -> Player{
 			players[playerTurn].score += turnScore
 		}
 		if firstTo10K == -1 && checkFor10K(score: players[playerTurn].score){
-			finalRound(player: players[playerTurn])
+			finalRound(player: players[playerTurn], players: players)
 			firstTo10K = playerTurn
 		}
 		playerTurn += 1
@@ -344,7 +389,7 @@ func play() -> Player{
 	return winner
 }
 
-func turn(player: Player) -> Int{
+func turn(player: Player, players: [Player]) -> Int{
 	var dicePool: [Int] = []
 	var keptDice: [Int] = []
 	var diceCount: [Int] = []
@@ -373,13 +418,42 @@ func turn(player: Player) -> Int{
 		canPass = false
 		repeat{
 			system("clear")
-			print("=================");
-			print(player.name, "'s Turn!");
-			print("=================");
-			print(player.name, "'s Score:", player.score);
-			print("Turn Score:", turnScore);
-			showRolls(dicePool: dicePool, selection: selection, count: &temp);
-			temp += 1;
+			print("\u{001B}[?25h", terminator: "") 
+			print("    ========================".white.bold)
+			showScoreboard(players: players)
+			print("    ========================".lightBlack.bold)
+			let chars: Int = (16 - player.name.count) / 2
+			var centeredName: String = "    "
+			if chars > 0{
+				for _ in 0...chars{
+					centeredName += " "
+				}
+				centeredName += player.name
+				centeredName += "'s Turn!"
+				print(centeredName.blue.blink.bold)
+			}
+			else{
+				print("    \(player.name)'s Turn!")
+			}
+			print("    ========================".red.bold)
+			let stringScore: String = String(turnScore)
+			var centeredTurn: String = "    "
+			let turnChars: Int = (5 - stringScore.count) / 2
+			if turnChars > 0{
+				for _ in 0...turnChars{
+					centeredTurn += " "
+				}
+				centeredTurn += "Turn Score: "
+				centeredTurn += stringScore
+				centeredTurn += " points"
+				print(centeredTurn.lightGreen.bold)
+			}
+			else{
+				print("    Turn Score: \(turnScore) points".lightGreen.bold);
+			}
+			centeredTurn = "    "
+			showRolls(dicePool: dicePool, selection: selection, count: &temp)
+			temp += 1
 
 			showKeptDice(keptDice: keptDice)
 			diceCount = countDice(dicePool: dicePool)
@@ -389,10 +463,10 @@ func turn(player: Player) -> Int{
 				selection = 0
 				continue
 			}
-
-			print("Enter the die # you wish to keep. Triple values will automatically be kept.");
-			print("Enter 9 to reroll dice or 0 to end your turn.");
-			print("Selection: ");
+			print("\u{001B}[?25h", terminator: "") 
+			print("    Enter the die # you wish to keep. Triple values will automatically be kept.")
+			print("    Enter 9 to reroll dice or 0 to end your turn.")
+			print("    Selection: ", terminator: "")
 			selection = getInput()
 			if isValid(selection: selection, dicePool: dicePool){
 				turnScore += scoreDice(dicePool: &dicePool, die: selection, dieCount: diceCount, keptDice: &keptDice)
@@ -406,17 +480,18 @@ func turn(player: Player) -> Int{
 			}
 			else if (selection == 0 && !canPass) || (selection == 9 && !canReroll){
 				system("clear")
-				print("==================");
-				print("   INVALID MOVE   ");
-				print("==================");
+				print("\u{001B}[?25h", terminator: "") 
+				print("    ========================".red.bold)
+				print("          INVALID MOVE      ".red.bold.blink)
+				print("    ========================\n".red.bold)
 				if selection == 0{
-					print(player.name, "cannot score out at this time!")
+					print("    \(player.name) cannot score out at this time!".red.bold)
 				}
 				else{
-					print(player.name, "cannot reroll at this time!")
+					print("    \(player.name) cannot reroll at this time!".red.bold)
 				}
 				selection = 7
-				system( " read -p'Press Enter to continue...' var " )
+				systemPause()
 			}
 			if dicePool.isEmpty{
 				selection = 9
@@ -430,23 +505,28 @@ func turn(player: Player) -> Int{
 		}
 	}
 	system("clear")
-	print("=================");
-	print(player.name, "'s TURN ENDS!")
-	print("=================");
+	print("\u{001B}[?25h", terminator: "") 
 	if farkle{
-		print(player.name, "HAS FARKLED!")
+		print("    =======================".red.bold)
+		print("    \(player.name)'s TURN ENDS!".red.bold.blink)
+		print("    =======================".red.bold)
+		print("    \(player.name) HAS FARKLED!".red.bold)
 	}
 	else{
-		print(player.name, "has scored", turnScore, "points this turn!")
+		print("    =======================".lightGreen.bold)
+		print("    \(player.name)'s TURN ENDS!".lightGreen.bold.blink)
+		print("    =======================".lightGreen.bold)
+		print("    \(player.name) has scored \(turnScore) points this turn!".lightGreen.bold)
 	}
-	system( " read -p'Press Enter to continue...' var " )
+	systemPause()
 	if farkle{
-		return 0;
+		return 0
 	}
-	return turnScore;
+	return turnScore
 }
 
 func gameLoop(){
+	print("\u{001B}[18m", terminator: "")
 	var selection: Int
 	var winner: Player = Player()
 	while true{
@@ -457,10 +537,11 @@ func gameLoop(){
 				winner = play()
 				congratulate(player: winner)
 				system("clear")
-				print("===================");
-				print("     QUESTION?     ");
-				print("===================\n");
-				print("Do you want to go back to the main menu? Yes/No?")
+				print("\u{001B}[?25h", terminator: "") 
+				print("    =========================".white.bold)
+				print("            QUESTION?        ".green.bold.blink)
+				print("    =========================\n".red.bold)
+				print("    Do you want to go back to the main menu? Yes/No?", terminator: "".lightMagenta.bold)
 				let answer: String = readLine()!
 				if answer == "Yes" || answer == "yes" || answer == "y" || answer == "Y"{
 					gameLoop()
@@ -472,8 +553,9 @@ func gameLoop(){
 				system("clear")
 				showRules()
 			case 3: exit(0)
-			default: print("Invalid Seleciton")
+			default: print("    Invalid Seleciton")
 		}
+		print("\u{001B}[?25h", terminator: "") 
 	}
 }
 

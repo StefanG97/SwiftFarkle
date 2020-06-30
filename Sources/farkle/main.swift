@@ -2,6 +2,30 @@ import Foundation
 import Rainbow
 
 extension String {
+    var length: Int {
+        return count
+    }
+
+    subscript (i: Int) -> String {
+        return self[i ..< i + 1]
+    }
+
+    func substring(fromIndex: Int) -> String {
+        return self[min(fromIndex, length) ..< length]
+    }
+
+    func substring(toIndex: Int) -> String {
+        return self[0 ..< max(0, toIndex)]
+    }
+
+    subscript (r: Range<Int>) -> String {
+        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
+                                            upper: min(length, max(0, r.upperBound))))
+        let start = index(startIndex, offsetBy: range.lowerBound)
+        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
+        return String(self[start ..< end])
+    }
+
     var isNumeric: Bool {
         guard self.count > 0 else { return false }
         let nums: Set<Character> = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
@@ -48,19 +72,15 @@ func getInput() -> Int{
 
 func showRules(){
 	print("""
-======================================================================================================
-FARKLE RULES
-======================================================================================================
-Farkle is a dice game that is multi-player with a minimum of two players, but no upper limit on the 
-number of participants. 
+========================================================================================================================================
+                                                      FARKLE RULES
+========================================================================================================================================
+Farkle is a dice game that is multi-player with a minimum of two players and maximum of eight players.
 
 The goal is to reach 10,000 points first.
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 POINTS:
-
 Points are acquired in one of six different ways.
-
   * A roll of a 1 is worth 100 points.
   * A roll of a 5 is worth 50 points.
   * Three (3) dices rolled at the same time with the same value is worth 100 times the face value. 
@@ -70,10 +90,8 @@ Points are acquired in one of six different ways.
   * Five (5) dices rolled at the same time with the same value is worth 100 times the face value, multiplied by four (4).
   * Six (6) dices rolled at the same time with the same value is worth 100 times the face value, multiplied by eight (8).
   * Again, exception is that four 1's rolled are 2,000 points, five 1's rolled are 4,000 points and six 1's rolled are 8,000 points.  
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 THE PLAY:
-
   * The first player rolls all six dice at the same time and sets aside any \"point dice\" (1's, 5's,
     or three of a kind). At this point the player has the option to continue to roll the remaining 
     dice to collect even more points, or stop and keep any points acquired. 
@@ -84,15 +102,12 @@ THE PLAY:
     to the next player. Any points collected during that turn are recorded.
   * If, in the course of one turn, all six dice become point dice and are set aside, the player must 
     roll all six dice at least one more time before stopping and keeping the points collected.
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 WINNING:
-
 In order to win, a player must get 10,000 points recorded.
-
 After a player gets over 10,000, each of the other players get one turn to try to beat the first 
 player who goes out. The player with the highest score at the end is declared the winner!\n
-""")
+""".bold)
 	systemPause()
 }
 
@@ -102,7 +117,7 @@ func showMenu(){
 	print("\u{001B}[?25h", terminator: "") 
 	print("=======================".white.bold)
 	print("   Welcome to Farkle   ".green.bold)
-	print("=======================\n".red.bold)
+	print("=======================".red.bold)
 	print("Maximize the console window for best results. \n".bold.blink)
 	print("1) New Game".green.bold)
 	print("2) Show Rules".yellow.bold)
@@ -126,7 +141,7 @@ func finalRound(player: Player, players: [Player]){
 	print("=======================".white.bold)
 	print("      FINAL ROUND      ".green.bold.blink)
 	print("=======================\n".red.bold)
-	print("\(player.name) has a score of \(player.score)!\n".lightMagenta.bold.blink)
+	print("\(player.name) has a score of \(player.score) points!\n".lightMagenta.bold.blink)
 	sleep(3)
 	system("clear")
 	print("=======================".white)
@@ -250,7 +265,7 @@ func promptNumPlayers(){
 	print("=======================".white.bold)
 	print("       NEW GAME        ".green.bold.blink)
 	print("=======================\n".red.bold)
-	print("How many players are there? ", terminator: "".lightYellow.bold)
+	print("How many players are playing? ".bold, terminator: "".lightYellow.bold)
 }
 
 func setupPlayerNames(players: inout [Player], numOfPlayers: Int){
@@ -265,6 +280,7 @@ func setupPlayerNames(players: inout [Player], numOfPlayers: Int){
 		var player: Player = Player()
 		player.name = name
 		players.append(player)
+		print("")
 	}
 }
 
@@ -392,12 +408,19 @@ func play() -> Player{
 	var firstTo10K: Int = -1
 	var turnScore: Int
 	promptNumPlayers()
-	while !(numOfPlayers > 1){
-		numOfPlayers = getInput()
-		if numOfPlayers < 2{
+	while !(numOfPlayers > 1 && numOfPlayers < 9){
+		let input: String = readLine(strippingNewline: true)!
+		if input[0] < "0" || input[0] > "9"{
+			numOfPlayers = 1
+		}
+		else{
+			numOfPlayers = Int(input)!	
+		}
+		if numOfPlayers < 2 || numOfPlayers > 8 {
 			print("\u{001B}[?25h", terminator: "") 
-			print("Invalid number of players. Must be more than 1.".lightRed.bold)
-			print("Try again: ".lightRed.bold)
+			print("Invalid number of players. Value must be between 2 and 8.\n".lightRed.bold)
+			print("Try again: ".lightRed.bold, terminator: "")
+			numOfPlayers = 1
 		}
 	}
 	var players: [Player] = []
@@ -476,9 +499,9 @@ func turn(player: Player, players: [Player]) -> Int{
 			print("========================".red.bold)
 			let stringScore: String = String(turnScore)
 			var centeredTurn: String = ""
-			let turnChars: Int = (4 - stringScore.count) / 2
+			let turnChars: Int = (5 - stringScore.count) / 2
 			if turnChars > 0{
-				for _ in 0...turnChars{
+				for _ in 1...turnChars{
 					centeredTurn += " "
 				}
 				centeredTurn += "Turn Score: "
@@ -544,17 +567,43 @@ func turn(player: Player, players: [Player]) -> Int{
 	}
 	system("clear")
 	print("\u{001B}[?25h", terminator: "") 
+
+	
+
 	if farkle{
+		let chars: Int = (11 - player.name.count) / 2
+		var centeredFarkle: String = ""
+		var centeredEndTurn: String = ""
+		if chars > 0{
+			for _ in 1...chars{
+				centeredFarkle += " "
+				centeredEndTurn += " "
+			}
+			centeredFarkle += player.name
+			centeredEndTurn += player.name
+			centeredEndTurn += "'s TURN ENDS!"
+			centeredFarkle += " HAS FARKLED!"
+		}
+
 		print("=======================".red.bold)
-		print("\(player.name)'s TURN ENDS!".red.bold.blink)
+		print((centeredEndTurn).red.bold.blink)
 		print("=======================".red.bold)
-		print("\(player.name) HAS FARKLED!".red.bold)
+		print(centeredFarkle.red.bold, "\n")
 	}
 	else{
+		let chars: Int = (11 - player.name.count) / 2
+		var centeredEndTurn: String = ""
+		if chars > 0{
+			for _ in 1...chars{
+				centeredEndTurn += " "
+			}
+			centeredEndTurn += player.name
+			centeredEndTurn += "'s TURN ENDS!"
+		}
 		print("=======================".lightGreen.bold)
-		print("\(player.name)'s TURN ENDS!".lightGreen.bold.blink)
+		print(centeredEndTurn.lightGreen.bold.blink)
 		print("=======================".lightGreen.bold)
-		print("\(player.name) has scored \(turnScore) points this turn!".lightGreen.bold)
+		print("\(player.name) has scored \(turnScore) points this turn!\n".lightGreen.bold)
 	}
 	systemPause()
 	if farkle{
@@ -579,7 +628,8 @@ func gameLoop(){
 				print("=========================".white.bold)
 				print("        QUESTION?        ".green.bold.blink)
 				print("=========================\n".red.bold)
-				print("Do you want to go back to the main menu? Yes/No?", terminator: "".lightMagenta.bold)
+				print("Do you want to go back to the main menu? Yes/No?\n".lightMagenta.bold)
+				print("Answer: ".bold, terminator: "")
 				let answer: String = readLine()!
 				if answer == "Yes" || answer == "yes" || answer == "y" || answer == "Y"{
 					gameLoop()

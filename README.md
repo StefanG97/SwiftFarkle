@@ -4,12 +4,11 @@ Final project for "Programming in Swift" course in Faculty of Mathematics and In
 
 ## About the game
 
-Farkle is a dice game that is multi-player with a minimum of two players, but no upper limit on the 
-number of participants. 
+Farkle is a dice game that is multi-player with a minimum of two players and maximum of eight players.
 
 The goal is to reach 10,000 points first.
 
-More detailed instructions about the game and the rules of the game can be seen in the main menu of the project.
+More detailed instructions about the game and the rules of the game can be seen in the " Show Menu" section in the  main menu of the project.
 
 ## Dependencies
 

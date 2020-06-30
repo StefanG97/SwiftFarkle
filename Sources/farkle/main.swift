@@ -32,7 +32,7 @@ struct Player{
 }
 
 func systemPause(){
-	print("    Press any key to continue...".white.bold, terminator: "")
+	print("Press any key to continue...".white.bold, terminator: "")
 	let _ = readLine(strippingNewline: true)!
 }
 
@@ -47,14 +47,52 @@ func getInput() -> Int{
 }
 
 func showRules(){
-	let path = FileManager.default.currentDirectoryPath + "/Rules.txt"
-	do{
-	    let contents = try String(contentsOfFile: path, encoding: .utf8)
-	    print(contents.bold)
-	}
-	catch let error as NSError {
-	    print("    Ooops! Something went wrong: \(error)")
-	}
+	print("""
+======================================================================================================
+FARKLE RULES
+======================================================================================================
+Farkle is a dice game that is multi-player with a minimum of two players, but no upper limit on the 
+number of participants. 
+
+The goal is to reach 10,000 points first.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+POINTS:
+
+Points are acquired in one of six different ways.
+
+  * A roll of a 1 is worth 100 points.
+  * A roll of a 5 is worth 50 points.
+  * Three (3) dices rolled at the same time with the same value is worth 100 times the face value. 
+    For example: three 2's is 200 points and three 5's rolled is worth 500 points.
+  * One exception is that three 1's rolled are 1,000 points, not 100.
+  * Four (4) dices rolled at the same time with the same value is worth 100 times the face value, multiplied by two (2).
+  * Five (5) dices rolled at the same time with the same value is worth 100 times the face value, multiplied by four (4).
+  * Six (6) dices rolled at the same time with the same value is worth 100 times the face value, multiplied by eight (8).
+  * Again, exception is that four 1's rolled are 2,000 points, five 1's rolled are 4,000 points and six 1's rolled are 8,000 points.  
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////    
+THE PLAY:
+
+  * The first player rolls all six dice at the same time and sets aside any \"point dice\" (1's, 5's,
+    or three of a kind). At this point the player has the option to continue to roll the remaining 
+    dice to collect even more points, or stop and keep any points acquired. 
+  * A Farkle occurs when the dice are rolled and no point dice appear. At this point the player loses
+    all the point dice they have collected during that turn and the play passes to the next player.
+    No points are recorded for that player's turn.
+  * If a player decides not to risk rolling a Farkle then they can stop rolling and the play passes 
+    to the next player. Any points collected during that turn are recorded.
+  * If, in the course of one turn, all six dice become point dice and are set aside, the player must 
+    roll all six dice at least one more time before stopping and keeping the points collected.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+WINNING:
+
+In order to win, a player must get 10,000 points recorded.
+
+After a player gets over 10,000, each of the other players get one turn to try to beat the first 
+player who goes out. The player with the highest score at the end is declared the winner!\n
+""")
 	systemPause()
 }
 
@@ -62,77 +100,77 @@ func showRules(){
 func showMenu(){
 	system("clear")
 	print("\u{001B}[?25h", terminator: "") 
-	print("    =======================".white.bold)
-	print("       Welcome to Farkle   ".green.bold)
-	print("    =======================\n".red.bold)
-	print("    Maximize the console window for best results. \n".bold.blink)
-	print("    1) New Game".green.bold)
-	print("    2) Show Rules".yellow.bold)
-	print("    3) Quit\n".red.bold)
-	print("    Please enter a selection: ".bold, terminator: "")
+	print("=======================".white.bold)
+	print("   Welcome to Farkle   ".green.bold)
+	print("=======================\n".red.bold)
+	print("Maximize the console window for best results. \n".bold.blink)
+	print("1) New Game".green.bold)
+	print("2) Show Rules".yellow.bold)
+	print("3) Quit\n".red.bold)
+	print("Please enter a selection: ".bold, terminator: "")
 }
 
 func congratulate(player: Player){
 	system("clear")
 	print("\u{001B}[?25h", terminator: "") 
-	print("    =======================".white.bold)
-	print("        CONGRATULATIONS    ".green.bold.blink)
-	print("    =======================\n".red.bold)
-	print("    \(player.name) is the winner with a score of \(player.score) points!\n".lightMagenta.bold)
+	print("=======================".white.bold)
+	print("    CONGRATULATIONS    ".green.bold.blink)
+	print("=======================\n".red.bold)
+	print("\(player.name) is the winner with a score of \(player.score) points!\n".lightMagenta.bold)
 	systemPause()
 }
 
 func finalRound(player: Player, players: [Player]){
 	system("clear")
 	print("\u{001B}[?25l", terminator: "")  
-	print("    =======================".white.bold)
-	print("          FINAL ROUND      ".green.bold.blink)
-	print("    =======================\n".red.bold)
-	print("    \(player.name) has a score of \(player.score)!\n".lightMagenta.bold.blink)
-	sleep(5)
+	print("=======================".white.bold)
+	print("      FINAL ROUND      ".green.bold.blink)
+	print("=======================\n".red.bold)
+	print("\(player.name) has a score of \(player.score)!\n".lightMagenta.bold.blink)
+	sleep(3)
 	system("clear")
-	print("    =======================".white)
+	print("=======================".white)
 	showScoreboard(players: players)
-	print("\n    The final round of play has begun! Good luck! \n".lightGreen.bold)
+	print("\nThe final round of play has begun! Good luck! \n".lightGreen.bold)
 	systemPause()
 	print("\u{001B}[?25h", terminator: "")
 }
 
 func showScoreboard(players: [Player]){
-	print("          LEADERBOARD       ".green.bold)
-	print("    ========================".red.bold)
+	print("      LEADERBOARD       ".green.bold)
+	print("========================".red.bold)
 	var tempPlayers: [Player] = players
 	tempPlayers.sort { (lhs: Player, rhs: Player) -> Bool in
 	    return lhs.score > rhs.score
 	}
 	for i in 0...players.count - 1{
-		print("    \(i+1). \(tempPlayers[i].name) : \(tempPlayers[i].score) points".bold)
+		print("\(i+1). \(tempPlayers[i].name) : \(tempPlayers[i].score) points".bold)
 	}
 }
 
 func showKeptDice(keptDice: [Int]){
 	print("\u{001B}[?25h", terminator: "") 
-	print("    +----------------------+".lightGreen.bold)
-	print("    |      Kept Dices      |".lightGreen.bold)
-	print("    +----------------------+".lightGreen.bold)
+	print("+----------------------+".lightGreen.bold)
+	print("|      Kept Dices      |".lightGreen.bold)
+	print("+----------------------+".lightGreen.bold)
 	for i in 0...keptDice.count - 1{
 		switch i {
-			case 0: print("    |     ⚀     :    \(keptDice[i])     |".red.bold)
-			case 1: print("    |     ⚁     :    \(keptDice[i])     |".lightBlack.bold)
-			case 2: print("    |     ⚂     :    \(keptDice[i])     |".lightGreen.bold)
-			case 3: print("    |     ⚃     :    \(keptDice[i])     |".yellow.bold)
-			case 4: print("    |     ⚄     :    \(keptDice[i])     |".magenta.bold)
-			case 5: print("    |     ⚅     :    \(keptDice[i])     |".cyan.bold)
-			default: print("    Out of Bounds")
+			case 0: print("|     ⚀     :    \(keptDice[i])     |".red.bold)
+			case 1: print("|     ⚁     :    \(keptDice[i])     |".lightBlack.bold)
+			case 2: print("|     ⚂     :    \(keptDice[i])     |".lightGreen.bold)
+			case 3: print("|     ⚃     :    \(keptDice[i])     |".yellow.bold)
+			case 4: print("|     ⚄     :    \(keptDice[i])     |".magenta.bold)
+			case 5: print("|     ⚅     :    \(keptDice[i])     |".cyan.bold)
+			default: print("Out of Bounds")
 		}
 	}
-	print("    +----------------------+\n".lightGreen.bold)
+	print("+----------------------+\n".lightGreen.bold)
 }
 
 func showRolls(dicePool: [Int], selection: Int, count: inout Int){
-	print("    +----------------------+".lightBlue.bold)
-	print("    |      Dice Rolls      |".lightBlue.bold)
-	print("    +----------------------+".lightBlue.bold)
+	print("+----------------------+".lightBlue.bold)
+	print("|      Dice Rolls      |".lightBlue.bold)
+	print("+----------------------+".lightBlue.bold)
 	print("\u{001B}[?25l", terminator: "") 
 	for i in 0...dicePool.count - 1{
 		if count == 0 || selection == 9{
@@ -141,54 +179,54 @@ func showRolls(dicePool: [Int], selection: Int, count: inout Int){
 				switch temp {
 					case 1:
 						usleep(50)
-						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚀".red.bold,"    |".lightBlue.bold, terminator: "")
+						print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚀".red.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					case 2:
 						usleep(50)
-						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚁".lightBlack.bold,"    |".lightBlue.bold, terminator: "")
+						print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚁".lightBlack.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					case 3:
 						usleep(50)
-						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚂".lightGreen.bold,"    |".lightBlue.bold, terminator: "")
+						print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚂".lightGreen.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					case 4:
 						usleep(50)
-						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚃".yellow.bold,"    |".lightBlue.bold, terminator: "")
-						print("    \r", terminator: "")
+						print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚃".yellow.bold,"    |".lightBlue.bold, terminator: "")
+						print("\r", terminator: "")
 					case 5:
 						usleep(50)
-						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚄".magenta.bold,"    |".lightBlue.bold, terminator: "")
+						print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚄".magenta.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					case 6:
 						usleep(50)
-						print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚅".cyan.bold,"    |".lightBlue.bold, terminator: "")
+						print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚅".cyan.bold,"    |".lightBlue.bold, terminator: "")
 						print("\r", terminator: "")
 					default: print("    error")	
 				}
 			}
 		}
 		switch dicePool[i]{
-			case 1: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚀".red.bold, "    |".lightBlue.bold)
-			case 2: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚁".lightBlack.bold, "    |".lightBlue.bold)
-			case 3: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚂".lightGreen.bold, "    |".lightBlue.bold)
-			case 4: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚃".yellow.bold, "    |".lightBlue.bold)
-			case 5: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚄".magenta.bold, "    |".lightBlue.bold)
-			case 6: print("    |    Die \(i + 1)   :  ".lightBlue.bold, "⚅".cyan.bold, "    |".lightBlue.bold)
-			default: print("    error")
+			case 1: print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚀".red.bold, "    |".lightBlue.bold)
+			case 2: print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚁".lightBlack.bold, "    |".lightBlue.bold)
+			case 3: print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚂".lightGreen.bold, "    |".lightBlue.bold)
+			case 4: print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚃".yellow.bold, "    |".lightBlue.bold)
+			case 5: print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚄".magenta.bold, "    |".lightBlue.bold)
+			case 6: print("|    Die \(i + 1)   :  ".lightBlue.bold, "⚅".cyan.bold, "    |".lightBlue.bold)
+			default: print("error")
 		}
 	}
 	print("\u{001B}[?25h", terminator: "") 
 	count += 1
-	print("    +----------------------+\n".lightBlue.bold)	
+	print("+----------------------+\n".lightBlue.bold)	
 }
 
 func welcomePlayers(players: [Player]){
 	var playerNames: String = ""
 	system("clear")
 	print("\u{001B}[?25h", terminator: "") 
-	print("    ========================".white.bold)
-	print("             WELCOME        ".green.bold.blink)
-	print("    ========================\n".red.bold)
+	print("========================".white.bold)
+	print("         WELCOME        ".green.bold.blink)
+	print("========================\n".red.bold)
 	for i in 0...players.count - 1{
 		if i < (players.count - 2) && players.count > 2{
 			playerNames.append(players[i].name)
@@ -202,27 +240,27 @@ func welcomePlayers(players: [Player]){
 			playerNames.append(players[i].name)
 		}
 	}
-	print("    Welcome \(playerNames)!\n".magenta.bold)
+	print("Welcome \(playerNames)!\n".magenta.bold)
 	systemPause()
 }
 
 func promptNumPlayers(){
 	system("clear")
 	print("\u{001B}[?25h", terminator: "") 
-	print("    =======================".white.bold)
-	print("           NEW GAME        ".green.bold.blink)
-	print("    =======================\n".red.bold)
-	print("    How many players are there? ", terminator: "".lightYellow.bold)
+	print("=======================".white.bold)
+	print("       NEW GAME        ".green.bold.blink)
+	print("=======================\n".red.bold)
+	print("How many players are there? ", terminator: "".lightYellow.bold)
 }
 
 func setupPlayerNames(players: inout [Player], numOfPlayers: Int){
 	system("clear")
 	print("\u{001B}[?25h", terminator: "") 
-	print("    ========================".white.bold)
-	print("          PLAYER NAMES      ".green.bold.blink)
-	print("    ========================\n".red.bold)
+	print("========================".white.bold)
+	print("      PLAYER NAMES      ".green.bold.blink)
+	print("========================\n".red.bold)
 	for i in 1...numOfPlayers{
-		print("    Enter name for Player \(i) (no spaces): ".lightGreen.bold, terminator: "")
+		print("Enter name for Player \(i) (no spaces): ".lightGreen.bold, terminator: "")
 		let name: String = readLine()!
 		var player: Player = Player()
 		player.name = name
@@ -315,7 +353,7 @@ func scoreDice(dicePool: inout [Int], die: Int, dieCount: [Int], keptDice: inout
 				else{
 					score = dieValue * 800
 				}
-			default: print("    err")
+			default: print("err")
 		}
 	}
 	else if dieValue == 1 || dieValue == 5{
@@ -358,8 +396,8 @@ func play() -> Player{
 		numOfPlayers = getInput()
 		if numOfPlayers < 2{
 			print("\u{001B}[?25h", terminator: "") 
-			print("    Invalid number of players. Must be more than 1.".lightRed.bold)
-			print("    Try again: ".lightRed.bold)
+			print("Invalid number of players. Must be more than 1.".lightRed.bold)
+			print("Try again: ".lightRed.bold)
 		}
 	}
 	var players: [Player] = []
@@ -419,13 +457,13 @@ func turn(player: Player, players: [Player]) -> Int{
 		repeat{
 			system("clear")
 			print("\u{001B}[?25h", terminator: "") 
-			print("    ========================".white.bold)
+			print("========================".white.bold)
 			showScoreboard(players: players)
-			print("    ========================".lightBlack.bold)
-			let chars: Int = (16 - player.name.count) / 2
-			var centeredName: String = "    "
+			print("========================".lightBlack.bold)
+			let chars: Int = (17 - player.name.count) / 2
+			var centeredName: String = ""
 			if chars > 0{
-				for _ in 0...chars{
+				for _ in 1...chars{
 					centeredName += " "
 				}
 				centeredName += player.name
@@ -433,12 +471,12 @@ func turn(player: Player, players: [Player]) -> Int{
 				print(centeredName.blue.blink.bold)
 			}
 			else{
-				print("    \(player.name)'s Turn!")
+				print("\(player.name)'s Turn!")
 			}
-			print("    ========================".red.bold)
+			print("========================".red.bold)
 			let stringScore: String = String(turnScore)
-			var centeredTurn: String = "    "
-			let turnChars: Int = (5 - stringScore.count) / 2
+			var centeredTurn: String = ""
+			let turnChars: Int = (4 - stringScore.count) / 2
 			if turnChars > 0{
 				for _ in 0...turnChars{
 					centeredTurn += " "
@@ -449,9 +487,9 @@ func turn(player: Player, players: [Player]) -> Int{
 				print(centeredTurn.lightGreen.bold)
 			}
 			else{
-				print("    Turn Score: \(turnScore) points".lightGreen.bold);
+				print("Turn Score: \(turnScore) points".lightGreen.bold);
 			}
-			centeredTurn = "    "
+			centeredTurn = ""
 			showRolls(dicePool: dicePool, selection: selection, count: &temp)
 			temp += 1
 
@@ -464,9 +502,9 @@ func turn(player: Player, players: [Player]) -> Int{
 				continue
 			}
 			print("\u{001B}[?25h", terminator: "") 
-			print("    Enter the die # you wish to keep. Triple values will automatically be kept.")
-			print("    Enter 9 to reroll dice or 0 to end your turn.")
-			print("    Selection: ", terminator: "")
+			print("Enter the die # you wish to keep. Triple values will automatically be kept.")
+			print("Enter 9 to reroll dice or 0 to end your turn.")
+			print("Selection: ", terminator: "")
 			selection = getInput()
 			if isValid(selection: selection, dicePool: dicePool){
 				turnScore += scoreDice(dicePool: &dicePool, die: selection, dieCount: diceCount, keptDice: &keptDice)
@@ -481,14 +519,14 @@ func turn(player: Player, players: [Player]) -> Int{
 			else if (selection == 0 && !canPass) || (selection == 9 && !canReroll){
 				system("clear")
 				print("\u{001B}[?25h", terminator: "") 
-				print("    ========================".red.bold)
-				print("          INVALID MOVE      ".red.bold.blink)
-				print("    ========================\n".red.bold)
+				print("========================".red.bold)
+				print("      INVALID MOVE      ".red.bold.blink)
+				print("========================\n".red.bold)
 				if selection == 0{
-					print("    \(player.name) cannot score out at this time!".red.bold)
+					print("\(player.name) cannot score out at this time!".red.bold)
 				}
 				else{
-					print("    \(player.name) cannot reroll at this time!".red.bold)
+					print("\(player.name) cannot reroll at this time!".red.bold)
 				}
 				selection = 7
 				systemPause()
@@ -507,16 +545,16 @@ func turn(player: Player, players: [Player]) -> Int{
 	system("clear")
 	print("\u{001B}[?25h", terminator: "") 
 	if farkle{
-		print("    =======================".red.bold)
-		print("    \(player.name)'s TURN ENDS!".red.bold.blink)
-		print("    =======================".red.bold)
-		print("    \(player.name) HAS FARKLED!".red.bold)
+		print("=======================".red.bold)
+		print("\(player.name)'s TURN ENDS!".red.bold.blink)
+		print("=======================".red.bold)
+		print("\(player.name) HAS FARKLED!".red.bold)
 	}
 	else{
-		print("    =======================".lightGreen.bold)
-		print("    \(player.name)'s TURN ENDS!".lightGreen.bold.blink)
-		print("    =======================".lightGreen.bold)
-		print("    \(player.name) has scored \(turnScore) points this turn!".lightGreen.bold)
+		print("=======================".lightGreen.bold)
+		print("\(player.name)'s TURN ENDS!".lightGreen.bold.blink)
+		print("=======================".lightGreen.bold)
+		print("\(player.name) has scored \(turnScore) points this turn!".lightGreen.bold)
 	}
 	systemPause()
 	if farkle{
@@ -538,10 +576,10 @@ func gameLoop(){
 				congratulate(player: winner)
 				system("clear")
 				print("\u{001B}[?25h", terminator: "") 
-				print("    =========================".white.bold)
-				print("            QUESTION?        ".green.bold.blink)
-				print("    =========================\n".red.bold)
-				print("    Do you want to go back to the main menu? Yes/No?", terminator: "".lightMagenta.bold)
+				print("=========================".white.bold)
+				print("        QUESTION?        ".green.bold.blink)
+				print("=========================\n".red.bold)
+				print("Do you want to go back to the main menu? Yes/No?", terminator: "".lightMagenta.bold)
 				let answer: String = readLine()!
 				if answer == "Yes" || answer == "yes" || answer == "y" || answer == "Y"{
 					gameLoop()
@@ -553,7 +591,7 @@ func gameLoop(){
 				system("clear")
 				showRules()
 			case 3: exit(0)
-			default: print("    Invalid Seleciton")
+			default: print("Invalid Seleciton")
 		}
 		print("\u{001B}[?25h", terminator: "") 
 	}

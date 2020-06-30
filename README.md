@@ -9,7 +9,7 @@ number of participants.
 
 The goal is to reach 10,000 points first.
 
-More detailed instructions about the game and the rules of the game can be seen in the main menu of the project, or in the file "Rules.txt".
+More detailed instructions about the game and the rules of the game can be seen in the main menu of the project.
 
 ## Dependencies
 
